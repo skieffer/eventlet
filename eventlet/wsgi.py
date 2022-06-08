@@ -1002,6 +1002,15 @@ If unsure, use eventlet.GreenPool.''')
                 client_socket, client_addr = sock.accept()
                 client_socket.settimeout(serv.socket_timeout)
                 serv.log.debug('({0}) accepted {1!r}'.format(serv.pid, client_addr))
+                ###################################################
+                import asyncio
+                try:
+                    asyncio.get_running_loop()
+                except RuntimeError:
+                    serv.log.info("--- NOT IN EVENT LOOP ---")
+                else:
+                    serv.log.info("--- IN EVENT LOOP ---")
+                ###################################################
                 connections[client_addr] = connection = [client_addr, client_socket, STATE_IDLE]
                 (pool.spawn(serv.process_request, connection)
                     .link(_clean_connection, connection))
